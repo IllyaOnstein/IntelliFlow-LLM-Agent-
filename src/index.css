@@ -1,0 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-headline: "Inter", "Noto Sans SC", sans-serif;
+  --font-body: "Inter", "Noto Sans SC", sans-serif;
+  --font-label: "Space Grotesk", "Noto Sans SC", sans-serif;
+
+  --color-on-secondary-container: #ff9a8a;
+  --color-background: #131313;
+  --color-surface-container-lowest: #0e0e0e;
+  --color-secondary-fixed: #ffdad4;
+  --color-tertiary-fixed: #dfe0ff;
+  --color-secondary-container: #7b2d23;
+  --color-outline-variant: #5a403c;
+  --color-on-tertiary: #001a98;
+  --color-surface-container-high: #2a2a2a;
+  --color-error: #ffb4ab;
+  --color-on-primary: #690000;
+  --color-surface-container: #1f1f1f;
+  --color-primary-fixed: #ffdad4;
+  --color-on-secondary: #5d170f;
+  --color-on-primary-container: #ff907f;
+  --color-outline: #aa8984;
+  --color-surface-container-low: #1b1b1b;
+  --color-on-tertiary-fixed-variant: #0d2ccc;
+  --color-on-error-container: #ffdad6;
+  --color-surface-container-highest: #353535;
+  --color-secondary-fixed-dim: #ffb4a8;
+  --color-surface-variant: #353535;
+  --color-primary-fixed-dim: #ffb4a8;
+  --color-tertiary-fixed-dim: #bcc3ff;
+  --color-on-primary-fixed: #410000;
+  --color-surface-bright: #393939;
+  --color-surface-tint: #ffb4a8;
+  --color-on-error: #690005;
+  --color-primary: #ffb4a8;
+  --color-surface: #131313;
+  --color-secondary: #ffb4a8;
+  --color-on-background: #e2e2e2;
+  --color-tertiary-container: #0025c8;
+  --color-on-surface: #e2e2e2;
+  --color-surface-dim: #131313;
+  --color-inverse-surface: #e2e2e2;
+  --color-on-surface-variant: #e3beb8;
+  --color-on-secondary-fixed-variant: #7b2d23;
+  --color-inverse-primary: #b52619;
+  --color-on-tertiary-fixed: #000d60;
+  --color-on-primary-fixed-variant: #920703;
+  --color-inverse-on-surface: #303030;
+  --color-tertiary: #bcc3ff;
+  --color-primary-container: #8b0000;
+  --color-error-container: #93000a;
+  --color-on-tertiary-container: #9ea9ff;
+  --color-on-secondary-fixed: #400201;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.glass-card, .glass-panel {
+  background: rgba(53, 53, 53, 0.4);
+  backdrop-filter: blur(40px);
+  border: 1px solid rgba(90, 64, 60, 0.15);
+}
+.perspective-card {
+  transform: perspective(1000px) rotateY(-5deg) rotateX(2deg);
+  transition: transform 0.5s ease;
+}
+.perspective-card:hover {
+  transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+}
+.perspective-grid {
+  perspective: 2000px;
+}
+.rotate-3d {
+  transform: rotateY(-15deg) rotateX(10deg);
+}
+.industrial-grid {
+  background-size: 40px 40px;
+  background-image: radial-gradient(circle, #353535 1px, transparent 1px);
+}
+.text-glow-red {
+  text-shadow: 0 0 15px rgba(139, 0, 0, 0.6);
+}
+.crimson-glow {
+  box-shadow: 0 0 40px -10px rgba(139, 0, 0, 0.4);
+}
+.status-glow {
+  box-shadow: 0 0 12px 2px var(--color-primary);
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface-container-lowest);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-container-high);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-outline-variant);
+}
