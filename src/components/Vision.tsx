@@ -1,8 +1,22 @@
 import { motion } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useState, useEffect } from 'react';
+import { Lock } from 'lucide-react';
+import CommunityWaitlistModal from './CommunityWaitlistModal';
 
 export default function Vision() {
   const { t } = useLanguage();
+  const [isCommunityModalOpen, setIsCommunityModalOpen] = useState(false);
+  const [hasAppliedCommunity, setHasAppliedCommunity] = useState(false);
+
+  useEffect(() => {
+    const applied = localStorage.getItem('hasAppliedCommunity') === 'true';
+    setHasAppliedCommunity(applied);
+  }, []);
+
+  const handleCommunitySuccess = () => {
+    setHasAppliedCommunity(true);
+  };
 
   return (
     <div id="vision" className="relative bg-[radial-gradient(circle,#353535_1px,transparent_1px)] bg-[length:40px_40px]">
@@ -168,9 +182,15 @@ export default function Vision() {
           transition={{ delay: 0.5 }}
           className="mb-20"
         >
-          <h2 className="text-5xl md:text-7xl font-black tracking-tighter font-headline mb-6 bg-gradient-to-r from-white via-on-surface-variant to-outline bg-clip-text text-transparent">
-            {t('vision.eco.title1')}<br/>{t('vision.eco.title2')}
-          </h2>
+          <div className="flex items-center gap-4 mb-6">
+            <h2 className="text-5xl md:text-7xl font-black tracking-tighter font-headline bg-gradient-to-r from-white via-on-surface-variant to-outline bg-clip-text text-transparent">
+              {t('vision.eco.title1')}<br/>{t('vision.eco.title2')}
+            </h2>
+            <div className="self-start mt-2 px-3 py-1 bg-[#8b0000]/20 border border-[#8b0000]/50 rounded-full flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#ff4d4d] animate-pulse"></span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#ff4d4d]">{t('community.badge')}</span>
+            </div>
+          </div>
           <p className="text-xl md:text-2xl text-on-surface-variant max-w-2xl font-light leading-relaxed">
             {t('vision.eco.desc')}
           </p>
@@ -244,9 +264,19 @@ export default function Vision() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.7 }}
-            className="md:col-span-5 rounded-3xl bg-surface-container overflow-hidden relative"
+            className="md:col-span-5 rounded-3xl bg-surface-container overflow-hidden relative group"
           >
-            <div className="p-8 md:p-12 h-full flex flex-col relative z-10">
+            {/* Locked Overlay */}
+            <div className="absolute inset-0 z-20 bg-[#0a0a0a]/40 backdrop-blur-[2px] flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="w-16 h-16 rounded-full bg-surface-container-highest/80 backdrop-blur-md border border-outline-variant/20 flex items-center justify-center mb-4 shadow-2xl">
+                <Lock className="w-6 h-6 text-on-surface-variant" />
+              </div>
+              <span className="font-label text-xs uppercase tracking-widest text-on-surface-variant bg-surface-container-highest/80 px-4 py-1.5 rounded-full border border-outline-variant/20">
+                {t('community.badge')}
+              </span>
+            </div>
+
+            <div className="p-8 md:p-12 h-full flex flex-col relative z-10 transition-transform duration-500 group-hover:scale-[0.98]">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center text-primary">
                   <span className="material-symbols-outlined">terminal</span>
@@ -311,9 +341,21 @@ export default function Vision() {
           transition={{ delay: 0.5 }}
           className="mt-24 flex flex-col items-center"
         >
-          <button className="group relative px-12 py-5 rounded-full bg-primary-container text-white font-headline font-black text-lg uppercase tracking-widest shadow-[0_0_40px_rgba(139,0,0,0.3)] hover:shadow-[0_0_60px_rgba(139,0,0,0.5)] transition-all duration-500 active:scale-95 overflow-hidden">
-            <span className="relative z-10">{t('vision.eco.cta.btn')}</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-primary-container via-[#920703] to-primary-container translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+          <button 
+            onClick={() => !hasAppliedCommunity && setIsCommunityModalOpen(true)}
+            disabled={hasAppliedCommunity}
+            className={`group relative px-12 py-5 rounded-full font-headline font-black text-lg uppercase tracking-widest transition-all duration-500 overflow-hidden ${
+              hasAppliedCommunity 
+                ? 'bg-surface-container-highest text-on-surface-variant cursor-not-allowed border border-outline-variant/20'
+                : 'bg-primary-container text-white shadow-[0_0_40px_rgba(139,0,0,0.3)] hover:shadow-[0_0_60px_rgba(139,0,0,0.5)] active:scale-95'
+            }`}
+          >
+            <span className="relative z-10">
+              {hasAppliedCommunity ? t('capabilities.cta.btn.applied') : t('vision.eco.cta.btn')}
+            </span>
+            {!hasAppliedCommunity && (
+              <div className="absolute inset-0 bg-gradient-to-r from-primary-container via-[#920703] to-primary-container translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+            )}
           </button>
           <p className="mt-6 font-label text-[10px] uppercase tracking-[0.3em] text-on-surface-variant/60">{t('vision.eco.cta.desc')}</p>
         </motion.div>
@@ -337,6 +379,12 @@ export default function Vision() {
           </div>
         </motion.div>
       </section>
+
+      <CommunityWaitlistModal 
+        isOpen={isCommunityModalOpen} 
+        onClose={() => setIsCommunityModalOpen(false)} 
+        onSuccess={handleCommunitySuccess}
+      />
     </div>
   );
 }

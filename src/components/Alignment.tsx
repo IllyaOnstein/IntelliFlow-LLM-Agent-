@@ -1,8 +1,11 @@
 import { motion } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useState } from 'react';
+import TrustCenterModal from './TrustCenterModal';
 
 export default function Alignment() {
   const { t } = useLanguage();
+  const [isTrustCenterOpen, setIsTrustCenterOpen] = useState(false);
 
   return (
     <div id="alignment">
@@ -26,7 +29,10 @@ export default function Alignment() {
             {t('alignment.desc')}
           </p>
           <div className="flex gap-6">
-            <button className="bg-primary-container text-on-primary-container px-8 py-4 rounded-xl font-headline font-bold uppercase tracking-tight flex items-center gap-2 hover:bg-on-primary-fixed-variant transition-colors">
+            <button 
+              onClick={() => setIsTrustCenterOpen(true)}
+              className="bg-primary-container text-on-primary-container px-8 py-4 rounded-xl font-headline font-bold uppercase tracking-tight flex items-center gap-2 hover:bg-on-primary-fixed-variant transition-colors hover:scale-105 active:scale-95"
+            >
               <span className="material-symbols-outlined">shield</span>
               {t('alignment.btn')}
             </button>
@@ -215,6 +221,11 @@ export default function Alignment() {
           </motion.div>
         </div>
       </section>
+
+      <TrustCenterModal 
+        isOpen={isTrustCenterOpen} 
+        onClose={() => setIsTrustCenterOpen(false)} 
+      />
     </div>
   );
 }

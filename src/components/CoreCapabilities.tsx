@@ -1,8 +1,21 @@
 import { motion } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useState, useEffect } from 'react';
+import WaitlistModal from './WaitlistModal';
 
 export default function CoreCapabilities() {
   const { t } = useLanguage();
+  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
+  const [hasApplied, setHasApplied] = useState(false);
+
+  useEffect(() => {
+    const applied = localStorage.getItem('hasApplied') === 'true';
+    setHasApplied(applied);
+  }, []);
+
+  const handleWaitlistSuccess = () => {
+    setHasApplied(true);
+  };
 
   return (
     <div className="pt-32 pb-24 overflow-x-hidden" id="capabilities">
@@ -202,8 +215,17 @@ export default function CoreCapabilities() {
             </div>
             <h3 className="text-4xl font-black mb-4">{t('capabilities.cta.title')}</h3>
             <p className="text-on-surface-variant max-w-md mb-8">{t('capabilities.cta.desc')}</p>
-            <button className="bg-primary-container text-on-primary-container px-8 py-4 rounded-xl font-bold uppercase tracking-tight flex items-center gap-2 hover:scale-[1.05] transition-transform">
-              {t('capabilities.cta.btn')} <span className="material-symbols-outlined">arrow_forward</span>
+            <button 
+              onClick={() => !hasApplied && setIsWaitlistOpen(true)}
+              disabled={hasApplied}
+              className={`px-8 py-4 rounded-xl font-bold uppercase tracking-tight flex items-center gap-2 transition-all duration-300 ${
+                hasApplied 
+                  ? 'bg-surface-container-highest text-on-surface-variant cursor-not-allowed border border-outline-variant/20'
+                  : 'bg-primary-container text-on-primary-container hover:scale-[1.05] hover:shadow-[0_0_30px_rgba(139,0,0,0.3)]'
+              }`}
+            >
+              {hasApplied ? t('capabilities.cta.btn.applied') : t('capabilities.cta.btn')} 
+              {!hasApplied && <span className="material-symbols-outlined">arrow_forward</span>}
             </button>
           </motion.div>
           <motion.div 
@@ -223,6 +245,12 @@ export default function CoreCapabilities() {
           </motion.div>
         </div>
       </section>
+
+      <WaitlistModal 
+        isOpen={isWaitlistOpen} 
+        onClose={() => setIsWaitlistOpen(false)} 
+        onSuccess={handleWaitlistSuccess}
+      />
     </div>
   );
 }

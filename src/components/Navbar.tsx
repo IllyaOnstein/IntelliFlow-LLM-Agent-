@@ -1,7 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Globe, ChevronDown } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, Activity } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useModals } from '../contexts/ModalContext';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,7 +11,11 @@ export default function Navbar() {
   const [activeSection, setActiveSection] = useState('');
   const [scrolled, setScrolled] = useState(false);
   const { language, setLanguage, t } = useLanguage();
+  const { openLoginModal } = useModals();
   const langDropdownRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isDocsPage = location.pathname === '/docs';
 
   const navLinks = [
     { id: 'workflow', label: t('nav.workflow') },
@@ -81,13 +87,14 @@ export default function Navbar() {
         <div className={`flex justify-between items-center transition-all duration-500 ${scrolled ? 'bg-[#131313]/80 backdrop-blur-xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] border border-outline-variant/20 rounded-full py-2 px-6' : 'bg-[#131313]/60 backdrop-blur-xl bg-gradient-to-b from-[#1b1b1b] to-transparent shadow-[0_60px_60px_-10px_rgba(0,0,0,0.5)] py-4'}`}>
           
           <div className="flex items-center gap-8">
-            <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-xl font-black tracking-tighter text-[#8B0000] font-headline flex-shrink-0">
+            <Link to="/" onClick={(e) => { if (!isDocsPage) { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }} className="text-xl font-black tracking-tighter text-[#8B0000] font-headline flex-shrink-0 flex items-center gap-2">
+              <Activity className="w-6 h-6 stroke-[3]" />
               IntelliFlow
-            </a>
+            </Link>
             
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-1 relative">
-              {navLinks.map((link) => (
+              {!isDocsPage ? navLinks.map((link) => (
                 <a
                   key={link.id}
                   href={`#${link.id}`}
@@ -107,7 +114,14 @@ export default function Navbar() {
                   )}
                   {link.label}
                 </a>
-              ))}
+              )) : (
+                <Link
+                  to="/"
+                  className="relative font-headline font-bold tracking-tight text-xs uppercase px-4 py-2 rounded-full transition-colors duration-300 ease-in-out z-10 text-[#e3beb8]/70 hover:text-white hover:bg-surface-container-high/30"
+                >
+                  {t('nav.home')}
+                </Link>
+              )}
             </div>
           </div>
 
@@ -146,8 +160,8 @@ export default function Navbar() {
                 )}
               </AnimatePresence>
             </div>
-            <button className="font-headline font-bold tracking-tight text-xs uppercase text-[#e3beb8]/80 hover:text-white transition-all px-3 py-2">{t('nav.login')}</button>
-            <button className="bg-primary-container text-on-primary-container font-headline font-bold tracking-tight text-xs uppercase px-5 py-2.5 rounded-full transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary-container/20">{t('nav.start')}</button>
+            <button onClick={openLoginModal} className="font-headline font-bold tracking-tight text-xs uppercase text-[#e3beb8]/80 hover:text-white transition-all px-3 py-2">{t('nav.login')}</button>
+            <button onClick={openLoginModal} className="bg-primary-container text-on-primary-container font-headline font-bold tracking-tight text-xs uppercase px-5 py-2.5 rounded-full transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary-container/20">{t('nav.start')}</button>
           </div>
 
           <div className="flex lg:hidden items-center gap-2">
@@ -202,7 +216,7 @@ export default function Navbar() {
           className="lg:hidden absolute top-full left-0 w-full px-4 mt-2"
         >
           <div className="bg-surface-container-low border border-surface-container-high rounded-2xl shadow-2xl p-4 flex flex-col gap-2 backdrop-blur-xl">
-            {navLinks.map((link) => (
+            {!isDocsPage ? navLinks.map((link) => (
               <a
                 key={link.id}
                 href={`#${link.id}`}
@@ -215,10 +229,18 @@ export default function Navbar() {
               >
                 {link.label}
               </a>
-            ))}
+            )) : (
+              <Link
+                to="/"
+                onClick={() => setIsOpen(false)}
+                className="block px-4 py-3 rounded-xl text-sm font-bold tracking-tight uppercase transition-colors text-on-surface-variant hover:bg-surface-container hover:text-white"
+              >
+                {t('nav.home')}
+              </Link>
+            )}
             <div className="mt-4 pt-4 border-t border-surface-container-high flex flex-col gap-3">
-              <button className="w-full text-center font-bold tracking-tight text-sm uppercase text-on-surface-variant hover:text-white py-3 rounded-xl hover:bg-surface-container transition-colors">{t('nav.login')}</button>
-              <button className="w-full bg-primary-container text-on-primary-container font-bold tracking-tight text-sm uppercase px-6 py-3 rounded-xl hover:bg-on-primary-fixed-variant transition-all shadow-lg">{t('nav.start')}</button>
+              <button onClick={() => { openLoginModal(); setIsOpen(false); }} className="w-full text-center font-bold tracking-tight text-sm uppercase text-on-surface-variant hover:text-white py-3 rounded-xl hover:bg-surface-container transition-colors">{t('nav.login')}</button>
+              <button onClick={() => { openLoginModal(); setIsOpen(false); }} className="w-full bg-primary-container text-on-primary-container font-bold tracking-tight text-sm uppercase px-6 py-3 rounded-xl hover:bg-on-primary-fixed-variant transition-all shadow-lg">{t('nav.start')}</button>
             </div>
           </div>
         </motion.div>

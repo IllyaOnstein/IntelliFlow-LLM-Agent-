@@ -1,13 +1,43 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
+import { Lock } from 'lucide-react';
+import ProQuotaModal from './ProQuotaModal';
+import LaunchNotifyModal from './LaunchNotifyModal';
+import RoadmapModal from './RoadmapModal';
+import { useModals } from '../contexts/ModalContext';
 
 export default function Pricing() {
   const [activeTab, setActiveTab] = useState<'individual' | 'enterprise'>('individual');
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { openWaitlistModal } = useModals();
+  const [showFreeToast, setShowFreeToast] = useState(false);
+  const [isProModalOpen, setIsProModalOpen] = useState(false);
+  const [isNotifyOpen, setIsNotifyOpen] = useState(false);
+  const [isRoadmapOpen, setIsRoadmapOpen] = useState(false);
+
+  const handleFreeClick = () => {
+    setShowFreeToast(true);
+    setTimeout(() => setShowFreeToast(false), 3000);
+  };
 
   return (
-    <section className="max-w-[1200px] mx-auto px-8 py-20" id="pricing">
+    <section className="max-w-[1200px] mx-auto px-8 py-20 relative" id="pricing">
+      {/* Free Plan Toast */}
+      <AnimatePresence>
+        {showFreeToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-surface-container-highest border border-outline-variant/20 px-6 py-3 rounded-full shadow-2xl backdrop-blur-md flex items-center gap-3"
+          >
+            <span className="w-2 h-2 rounded-full bg-green-500"></span>
+            <span className="text-sm font-medium text-on-surface">{t('pricing.free.toast')}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <header className="max-w-4xl mx-auto text-center mb-16">
         <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-tight">
           {t('pricing.title1')} <span className="text-primary">{t('pricing.title2')}</span>
@@ -80,7 +110,10 @@ export default function Pricing() {
                     <span className="text-sm font-medium">{t('pricing.free.feat4')}</span>
                   </li>
                 </ul>
-                <button className="w-full py-4 rounded-xl border border-outline-variant text-on-surface-variant font-label font-bold uppercase tracking-widest hover:bg-surface-variant hover:text-white transition-all duration-300">
+                <button 
+                  onClick={handleFreeClick}
+                  className="w-full py-4 rounded-xl border border-outline-variant text-on-surface-variant font-label font-bold uppercase tracking-widest hover:bg-surface-variant hover:text-white transition-all duration-300"
+                >
                   {t('pricing.free.btn')}
                 </button>
               </div>
@@ -126,7 +159,10 @@ export default function Pricing() {
                       <span className="text-sm font-bold">{t('pricing.pro.feat4')}</span>
                     </li>
                   </ul>
-                  <button className="w-full py-5 rounded-xl bg-primary-container text-white font-label font-bold uppercase tracking-widest hover:bg-on-primary-fixed-variant transition-all duration-300 shadow-xl active:scale-95 flex items-center justify-center gap-2">
+                  <button 
+                    onClick={() => setIsProModalOpen(true)}
+                    className="w-full py-5 rounded-xl bg-primary-container text-white font-label font-bold uppercase tracking-widest hover:bg-on-primary-fixed-variant transition-all duration-300 shadow-xl active:scale-95 flex items-center justify-center gap-2"
+                  >
                     {t('pricing.pro.btn')} <span className="material-symbols-outlined text-lg">arrow_forward</span>
                   </button>
                 </div>
@@ -141,6 +177,39 @@ export default function Pricing() {
               transition={{ duration: 0.3 }}
               className="grid grid-cols-1 md:grid-cols-3 gap-8"
             >
+              {/* Custom Integration (SDK) */}
+              <div className="glass-panel p-10 rounded-3xl flex flex-col hover:scale-[1.02] transition-all duration-500 bg-surface-container-low border border-outline-variant/15">
+                <span className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4">{t('pricing.ent.sdk.badge')}</span>
+                <h3 className="font-headline font-bold text-3xl text-white mb-2">{t('pricing.ent.sdk.title')}</h3>
+                <div className="flex items-baseline mb-8">
+                  <span className="text-4xl font-black text-white" translate="no">{t('pricing.ent.sdk.price')}</span>
+                  <span className="text-on-surface-variant ml-2">{t('pricing.ent.sdk.period')}</span>
+                </div>
+                <p className="text-on-surface-variant text-sm leading-relaxed mb-8 h-12">
+                  {t('pricing.ent.sdk.desc')}
+                </p>
+                <ul className="space-y-4 mb-10 flex-grow">
+                  <li className="flex items-center text-sm text-on-surface">
+                    <span className="material-symbols-outlined text-primary mr-3 text-lg">code</span>
+                    {t('pricing.ent.sdk.feat1')}
+                  </li>
+                  <li className="flex items-center text-sm text-on-surface">
+                    <span className="material-symbols-outlined text-primary mr-3 text-lg">code</span>
+                    {t('pricing.ent.sdk.feat2')}
+                  </li>
+                  <li className="flex items-center text-sm text-on-surface">
+                    <span className="material-symbols-outlined text-primary mr-3 text-lg">code</span>
+                    {t('pricing.ent.sdk.feat3')}
+                  </li>
+                </ul>
+                <button 
+                  onClick={() => setIsRoadmapOpen(true)}
+                  className="w-full py-4 rounded-xl border border-[#4B5563] text-on-surface-variant/70 font-label font-bold uppercase tracking-wider hover:bg-white/5 hover:border-blue-400/30 hover:text-blue-200 hover:shadow-[0_0_15px_rgba(96,165,250,0.15)] transition-all flex items-center justify-center gap-2"
+                >
+                  <span className="text-lg">🚧</span> {t('pricing.ent.sdk.btn')}
+                </button>
+              </div>
+
               {/* SaaS Professional */}
               <div className="glass-panel p-10 rounded-3xl flex flex-col hover:scale-[1.02] transition-all duration-500 bg-surface-container-low border border-outline-variant/15">
                 <span className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4">{t('pricing.ent.saas.badge')}</span>
@@ -166,8 +235,11 @@ export default function Pricing() {
                     {t('pricing.ent.saas.feat3')}
                   </li>
                 </ul>
-                <button className="w-full py-4 rounded-xl border border-outline-variant hover:bg-surface-container-highest transition-all text-sm font-bold uppercase tracking-wider text-white">
-                  {t('pricing.ent.saas.btn')}
+                <button 
+                  onClick={() => setIsNotifyOpen(true)}
+                  className="w-full py-4 rounded-xl border border-[#4B5563] text-on-surface-variant/70 font-label font-bold uppercase tracking-wider hover:bg-white/5 hover:border-blue-400/30 hover:text-blue-200 hover:shadow-[0_0_15px_rgba(96,165,250,0.15)] transition-all flex items-center justify-center gap-2"
+                >
+                  <Lock className="w-4 h-4" /> {t('pricing.ent.saas.btn')}
                 </button>
               </div>
 
@@ -205,40 +277,16 @@ export default function Pricing() {
                       {t('pricing.ent.private.feat4')}
                     </li>
                   </ul>
-                  <button className="w-full py-4 rounded-xl bg-gradient-to-r from-[#8B0000] to-[#920703] hover:scale-[1.02] transition-all text-sm font-bold uppercase tracking-wider text-white shadow-[0_10px_20px_-5px_rgba(139,0,0,0.4)]">
-                    {t('pricing.ent.private.btn')}
-                  </button>
+                  <motion.button 
+                    whileTap={{ x: [0, -5, 5, -5, 5, 0] }}
+                    className="w-full py-4 rounded-xl border border-[#4B5563] text-on-surface-variant/70 font-label font-bold uppercase tracking-wider hover:bg-white/5 hover:border-blue-400/30 hover:text-blue-200 hover:shadow-[0_0_15px_rgba(96,165,250,0.15)] transition-all flex items-center justify-center gap-2"
+                  >
+                    <Lock className="w-4 h-4" /> {t('pricing.ent.private.btn')}
+                  </motion.button>
+                  <p className="mt-4 text-[10px] text-on-surface-variant/50 leading-relaxed text-center">
+                    {t('pricing.ent.private.note')}
+                  </p>
                 </div>
-              </div>
-
-              {/* Custom Integration */}
-              <div className="glass-panel p-10 rounded-3xl flex flex-col hover:scale-[1.02] transition-all duration-500 bg-surface-container-low border border-outline-variant/15">
-                <span className="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4">{t('pricing.ent.sdk.badge')}</span>
-                <h3 className="font-headline font-bold text-3xl text-white mb-2">{t('pricing.ent.sdk.title')}</h3>
-                <div className="flex items-baseline mb-8">
-                  <span className="text-4xl font-black text-white" translate="no">{t('pricing.ent.sdk.price')}</span>
-                  <span className="text-on-surface-variant ml-2">{t('pricing.ent.sdk.period')}</span>
-                </div>
-                <p className="text-on-surface-variant text-sm leading-relaxed mb-8 h-12">
-                  {t('pricing.ent.sdk.desc')}
-                </p>
-                <ul className="space-y-4 mb-10 flex-grow">
-                  <li className="flex items-center text-sm text-on-surface">
-                    <span className="material-symbols-outlined text-primary mr-3 text-lg">code</span>
-                    {t('pricing.ent.sdk.feat1')}
-                  </li>
-                  <li className="flex items-center text-sm text-on-surface">
-                    <span className="material-symbols-outlined text-primary mr-3 text-lg">code</span>
-                    {t('pricing.ent.sdk.feat2')}
-                  </li>
-                  <li className="flex items-center text-sm text-on-surface">
-                    <span className="material-symbols-outlined text-primary mr-3 text-lg">code</span>
-                    {t('pricing.ent.sdk.feat3')}
-                  </li>
-                </ul>
-                <button className="w-full py-4 rounded-xl border border-outline-variant hover:bg-surface-container-highest transition-all text-sm font-bold uppercase tracking-wider text-white">
-                  {t('pricing.ent.sdk.btn')}
-                </button>
               </div>
             </motion.div>
           )}
@@ -332,12 +380,21 @@ export default function Pricing() {
         <h2 className="font-headline font-black text-4xl mb-6">{t('pricing.cta.title')}</h2>
         <p className="text-on-surface-variant mb-12 text-lg">{t('pricing.cta.desc')}</p>
         <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
-          <button className="bg-primary-container text-white px-10 py-5 rounded-xl font-bold uppercase tracking-wider text-sm hover:bg-on-primary-fixed-variant transition-all shadow-[0_20px_40px_-10px_rgba(139,0,0,0.5)] hover:scale-105 active:scale-95">
+          <button 
+            onClick={() => openWaitlistModal(t('waitlist.pro.title'))}
+            className="bg-primary-container text-white px-10 py-5 rounded-xl font-bold uppercase tracking-wider text-sm hover:bg-on-primary-fixed-variant transition-all shadow-[0_20px_40px_-10px_rgba(139,0,0,0.5)] hover:scale-105 active:scale-95"
+          >
             {t('pricing.cta.btn1')}
           </button>
-          <button className="border border-outline-variant text-on-surface-variant px-10 py-5 rounded-xl font-bold uppercase tracking-wider text-sm hover:bg-surface-container-high hover:text-white transition-all hover:scale-105 active:scale-95">
+          <a 
+            href={language === 'zh' 
+              ? "mailto:onsteinillya@gmail.com?subject=[IntelliFlow 产学研探讨] 架构评估与场景落地交流&body=你好：%0D%0A%0D%0A我看了 IntelliFlow 的官网演示，对系统中的 DAG 逆向推导架构与防 Prompt 注入沙箱非常感兴趣。%0D%0A%0D%0A希望能进一步了解该系统在高校教务自动化场景中的技术细节。请回复邮件沟通。"
+              : "mailto:onsteinillya@gmail.com?subject=[IntelliFlow Academic-Industry Collaboration] Architecture Evaluation & Scenario Implementation&body=Hello,%0D%0A%0D%0AI watched the IntelliFlow official demo and am very interested in the DAG reverse inference architecture and anti-prompt injection sandbox.%0D%0A%0D%0AI hope to learn more about the technical details of this system in the context of university administrative automation. Please reply to discuss further."
+            }
+            className="border border-outline-variant text-on-surface-variant px-10 py-5 rounded-xl font-bold uppercase tracking-wider text-sm hover:bg-surface-container-high hover:text-white transition-all hover:scale-105 active:scale-95 inline-block"
+          >
             {t('pricing.cta.btn2')}
-          </button>
+          </a>
         </div>
       </motion.div>
 
@@ -357,46 +414,71 @@ export default function Pricing() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ staggerChildren: 0.1, delayChildren: 0.7 }}
-          className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-40 grayscale contrast-125"
+          className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-60 grayscale contrast-125"
         >
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.5 }}
-            className="text-2xl font-black tracking-tighter flex items-center gap-2 hover:opacity-100 hover:grayscale-0 transition-all duration-300 cursor-default"
+            className="group relative text-2xl font-black tracking-tighter flex items-center gap-2 hover:opacity-100 hover:grayscale-0 transition-all duration-300 cursor-default"
           >
             <span className="material-symbols-outlined">school</span> STANFORD
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-72 p-4 bg-surface-container-highest rounded-xl border border-outline-variant/30 text-[11px] text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-2xl z-[100]">
+              IntelliFlow DAG 推理引擎的底层编排逻辑，深度致敬并参考了 Stanford NLP 实验室的 DSPy 框架与 Agentic Workflow 理论。
+            </div>
           </motion.div>
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.6 }}
-            className="text-2xl font-black tracking-tighter flex items-center gap-2 hover:opacity-100 hover:grayscale-0 transition-all duration-300 cursor-default"
+            className="group relative text-2xl font-black tracking-tighter flex items-center gap-2 hover:opacity-100 hover:grayscale-0 transition-all duration-300 cursor-default"
           >
-            <span className="material-symbols-outlined">science</span> MIT LABS
+            <span className="material-symbols-outlined">science</span> MIT CSAIL
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-72 p-4 bg-surface-container-highest rounded-xl border border-outline-variant/30 text-[11px] text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-2xl z-[100]">
+              架构灵感：深度契合 MIT CSAIL 倡导的 Neuro-Symbolic AI（神经符号 AI）范式，实现大模型模糊理解与精确算子执行的完美协同。
+            </div>
           </motion.div>
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.7 }}
-            className="text-2xl font-black tracking-tighter flex items-center gap-2 hover:opacity-100 hover:grayscale-0 transition-all duration-300 cursor-default"
+            className="group relative text-2xl font-black tracking-tighter flex items-center gap-2 hover:opacity-100 hover:grayscale-0 transition-all duration-300 cursor-default"
           >
-            <span className="material-symbols-outlined">hub</span> NEXUS AI
+            <span className="material-symbols-outlined">hub</span> UC BERKELEY
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-72 p-4 bg-surface-container-highest rounded-xl border border-outline-variant/30 text-[11px] text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-2xl z-[100]">
+              编排底座：底层 DAG 并发调度引擎，其设计哲学致敬了 UC Berkeley 最新发布的 LLMCompiler 框架，实现多算子的极速并行执行。
+            </div>
           </motion.div>
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.8 }}
-            className="text-2xl font-black tracking-tighter flex items-center gap-2 hover:opacity-100 hover:grayscale-0 transition-all duration-300 cursor-default"
+            className="group relative text-2xl font-black tracking-tighter flex items-center gap-2 hover:opacity-100 hover:grayscale-0 transition-all duration-300 cursor-default"
           >
-            <span className="material-symbols-outlined">architecture</span> ATOMICA
+            <span className="material-symbols-outlined">architecture</span> PRINCETON
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-72 p-4 bg-surface-container-highest rounded-xl border border-outline-variant/30 text-[11px] text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-2xl z-[100]">
+              推理范式：内置 AI 节点的工作模式，严格遵循了 Princeton 大学与 Google 联合提出的 ReAct (Reasoning and Acting) 机制，彻底分离语义推理与动作执行。
+            </div>
           </motion.div>
         </motion.div>
       </div>
+
+      <ProQuotaModal 
+        isOpen={isProModalOpen} 
+        onClose={() => setIsProModalOpen(false)} 
+      />
+      <LaunchNotifyModal
+        isOpen={isNotifyOpen}
+        onClose={() => setIsNotifyOpen(false)}
+      />
+      <RoadmapModal
+        isOpen={isRoadmapOpen}
+        onClose={() => setIsRoadmapOpen(false)}
+      />
     </section>
   );
 }

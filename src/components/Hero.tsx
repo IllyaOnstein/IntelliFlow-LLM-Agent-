@@ -1,8 +1,11 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useModals } from '../contexts/ModalContext';
 
 export default function Hero() {
   const { t } = useLanguage();
+  const { openLoginModal } = useModals();
 
   return (
     <main className="relative min-h-screen flex flex-col items-center pt-48 pb-32 overflow-hidden">
@@ -44,12 +47,12 @@ export default function Hero() {
           transition={{ delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-24"
         >
-          <button className="bg-primary-container hover:bg-on-primary-fixed-variant text-on-primary-container px-10 py-4 rounded-full text-lg font-bold shadow-[0_0_30px_rgba(139,0,0,0.5)] transition-all duration-300 hover:scale-105 active:scale-95">
+          <button onClick={openLoginModal} className="bg-primary-container hover:bg-on-primary-fixed-variant text-on-primary-container px-10 py-4 rounded-full text-lg font-bold shadow-[0_0_30px_rgba(139,0,0,0.5)] transition-all duration-300 hover:scale-105 active:scale-95">
             {t('hero.start')}
           </button>
-          <button className="glass-panel bg-surface-container-high/40 border border-outline-variant/15 text-on-surface px-10 py-4 rounded-full text-lg font-medium hover:bg-surface-container-highest/60 transition-all duration-300">
+          <Link to="/docs" className="glass-panel bg-surface-container-high/40 border border-outline-variant/15 text-on-surface px-10 py-4 rounded-full text-lg font-medium hover:bg-surface-container-highest/60 transition-all duration-300 hover:scale-105 active:scale-95 inline-block">
             {t('hero.docs')}
-          </button>
+          </Link>
         </motion.div>
       </div>
 
